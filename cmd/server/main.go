@@ -13,7 +13,13 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/warehouses", warehouseHandler.Get())
+	warehousesRoutes := router.Group("/warehouses")
+	{
+		warehousesRoutes.GET("/", warehouseHandler.Get())
+		warehousesRoutes.POST("/", warehouseHandler.Store())
+		warehousesRoutes.PATCH("/:id", warehouseHandler.Get())
+		warehousesRoutes.DELETE("/:id", warehouseHandler.Get())
+	}
 
 	router.Run()
 }
