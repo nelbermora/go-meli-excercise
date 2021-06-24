@@ -23,24 +23,27 @@ func main() {
 
 	warehousesRoutes := router.Group("/warehouses")
 	{
-		warehousesRoutes.GET("/", warehouseHandler.Get())
+		warehousesRoutes.GET("/", warehouseHandler.GetAll())
+		warehousesRoutes.GET("/:id", warehouseHandler.Get())
 		warehousesRoutes.POST("/", warehouseHandler.Store())
-		warehousesRoutes.PATCH("/:id", warehouseHandler.Get())
-		warehousesRoutes.DELETE("/:id", warehouseHandler.Get())
+		warehousesRoutes.PATCH("/:id", warehouseHandler.Update())
+		warehousesRoutes.DELETE("/:id", warehouseHandler.Delete())
 	}
 	buyersRoutes := router.Group("/buyers")
 	{
-		buyersRoutes.GET("/", buyerHandler.Get())
+		buyersRoutes.GET("/", buyerHandler.GetAll())
+		buyersRoutes.GET("/:id", buyerHandler.Get())
 		buyersRoutes.POST("/", buyerHandler.Store())
-		buyersRoutes.PATCH("/:id", buyerHandler.Get())
-		buyersRoutes.DELETE("/:id", buyerHandler.Get())
+		buyersRoutes.PATCH("/:id", buyerHandler.Update())
+		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
 	}
 	employeesRoutes := router.Group("/employees")
 	{
-		employeesRoutes.GET("/", employeeHandler.Get())
+		employeesRoutes.GET("/", employeeHandler.GetAll())
+		employeesRoutes.GET("/:id", employeeHandler.Get())
 		employeesRoutes.POST("/", employeeHandler.Store())
-		employeesRoutes.PATCH("/:id", employeeHandler.Get())
-		employeesRoutes.DELETE("/:id", employeeHandler.Get())
+		employeesRoutes.PATCH("/:id", employeeHandler.Update())
+		employeesRoutes.DELETE("/:id", employeeHandler.Delete())
 	}
 
 	router.Run()
