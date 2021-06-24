@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 
-	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/warehouse"
 	"github.com/BenjaminBergerM/go-meli-exercise/pkg/web"
 	"github.com/gin-gonic/gin"
@@ -39,14 +38,14 @@ func (w *Warehouse) Store() gin.HandlerFunc {
 	}
 
 	type response struct {
-		Data domain.Warehouse `json:"data"`
+		Data interface{} `json:"data"`
 	}
 
 	return func(c *gin.Context) {
 		var req request
 
 		if err := c.Bind(&req); err != nil {
-			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
+			c.JSON(422, web.NewError(422, "json decoding: "+err.Error()))
 			return
 		}
 		if req.Address == "" {
