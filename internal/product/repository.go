@@ -9,12 +9,31 @@ import (
 
 // Repository encapsulates the storage of a Product.
 type Repository interface {
+	GetAll(ctx context.Context) ([]domain.Product, error)
 	Save(ctx context.Context, p domain.Product) (int, error)
 	Update(ctx context.Context, p domain.Product) error
 }
 
 type repository struct {
 	db *sql.DB
+}
+
+func (r *repository) GetAll(ctx context.Context) ([]domain.Product, error) {
+	rows, err := r.db.Query(`SELECT * FROM "main"."products"`)
+	if err != nil{
+		return nil, err
+	}
+
+	var products []domain.Product
+
+	for rows.Next() {
+		p := domain.Product{}
+		_ = rows.Scan(&p.ID, &p.Description, &p.ExpirationRate, &p.FreezingRate, &p.Height, &p.Length, &p.Netweight, &p.ProductCode, &p.RecomFreezTemp, &p.Width, &p.ProductTypeID, &p.SellerID)
+		products = append(products, p)
+	}
+
+
+	return products, nil
 }
 
 func NewRepository(db *sql.DB) Repository {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	"github.com/BenjaminBergerM/go-meli-exercise/pkg/web"
@@ -16,6 +15,27 @@ type Product struct {
 func NewProduct(w product.Service) *Product {
 	return &Product{
 		productService: w,
+	}
+}
+
+func (p *Product) GetAll() gin.HandlerFunc {
+	type request struct {
+	}
+
+	type response struct {
+		Data []domain.Product `json:"data"`
+	}
+
+	return func(c *gin.Context) {
+
+		ctx := context.Background()
+		products, err := p.productService.GetAll(ctx)
+		if err != nil {
+			c.JSON(404, web.NewError(404, err.Error()))
+			return
+		}
+
+		c.JSON(201, &response{products})
 	}
 }
 
@@ -80,12 +100,12 @@ func (p *Product) Store() gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		warehouse, err := p.productService.Store(ctx, req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
+		product, err := p.productService.Store(ctx, req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
 
 		}
 
-		c.JSON(201, &response{warehouse})
+		c.JSON(201, &response{product})
 	}
 }
 

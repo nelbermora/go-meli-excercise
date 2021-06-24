@@ -47,6 +47,7 @@ func main() {
 		employeesRoutes.POST("/", employeeHandler.Store())
 		employeesRoutes.PATCH("/:id", employeeHandler.Update())
 		employeesRoutes.DELETE("/:id", employeeHandler.Delete())
+
 	}
 	db, _ := sql.Open("sqlite3", "./meli.db")
 	productRepo := product.NewRepository(db)
@@ -54,7 +55,7 @@ func main() {
 	productHandler := handler.NewProduct(productService)
 	productRoutes := router.Group("/products")
 	{
-		productRoutes.GET("/", productHandler.Get())
+		productRoutes.GET("/", productHandler.GetAll())
 		productRoutes.POST("/", productHandler.Store())
 		productRoutes.PATCH("/:id", productHandler.Get())
 		productRoutes.DELETE("/:id", productHandler.Get())

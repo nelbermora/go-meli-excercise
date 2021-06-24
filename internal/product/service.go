@@ -2,7 +2,6 @@ package product
 
 import (
 	"context"
-	"fmt"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
@@ -11,6 +10,7 @@ import (
 // since the underlying concrete implementation does not export any other method that is not in the interface,
 // we decided to define it where it is implemented rather where it is used (commonly in a handler).
 type Service interface {
+	GetAll(ctx context.Context) ([]domain.Product, error)
 	Store(ctx context.Context, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
 }
 
@@ -40,8 +40,6 @@ func (s *service) Store(ctx context.Context, description, productCode string, he
 	}
 
 	id, err := s.repository.Save(ctx, p)
-	fmt.Println(err)
-	fmt.Println(id)
 	if err != nil {
 		return domain.Product{}, err
 	}
@@ -49,4 +47,8 @@ func (s *service) Store(ctx context.Context, description, productCode string, he
 	p.ID = id
 
 	return p, nil
+}
+
+func (s *service) GetAll(ctx context.Context) ([]domain.Product, error) {
+	return s.repository.GetAll(ctx)
 }
