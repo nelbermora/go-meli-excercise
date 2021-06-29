@@ -56,9 +56,10 @@ func main() {
 	productRoutes := router.Group("/products")
 	{
 		productRoutes.GET("/", productHandler.GetAll())
+		productRoutes.GET("/:id", productHandler.Get())
 		productRoutes.POST("/", productHandler.Store())
-		productRoutes.PATCH("/:id", productHandler.Get())
-		productRoutes.DELETE("/:id", productHandler.Get())
+		productRoutes.PUT("/:id", productHandler.Update())
+		productRoutes.DELETE("/:id", productHandler.Delete())
 	}
 
 	router.Run()

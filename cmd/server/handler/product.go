@@ -6,6 +6,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	"github.com/BenjaminBergerM/go-meli-exercise/pkg/web"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type Product struct {
@@ -19,8 +20,6 @@ func NewProduct(w product.Service) *Product {
 }
 
 func (p *Product) GetAll() gin.HandlerFunc {
-	type request struct {
-	}
 
 	type response struct {
 		Data []domain.Product `json:"data"`
@@ -39,15 +38,27 @@ func (p *Product) GetAll() gin.HandlerFunc {
 	}
 }
 
-func (w *Product) Get() gin.HandlerFunc {
-	type request struct {
-	}
+func (p *Product) Get() gin.HandlerFunc {
+
 
 	type response struct {
+		Data domain.Product `json:"data"`
 	}
 
 	return func(c *gin.Context) {
+		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		if err != nil {
+			c.JSON(400, web.NewError(400, "invalid ID"))
+			return
+		}
+		ctx := context.Background()
+		prod, err := p.productService.Get(ctx, int(id))
+		if err != nil {
+			c.JSON(404, web.NewError(404, "Product not found"))
+			return
+		}
 
+		c.JSON(201, &response{prod})
 	}
 }
 
@@ -109,26 +120,66 @@ func (p *Product) Store() gin.HandlerFunc {
 	}
 }
 
-func (w *Product) Update() gin.HandlerFunc {
+func (p *Product) Update() gin.HandlerFunc {
+
 	type request struct {
+		Description    string  `json:"description"`
+		ExpirationRate int     `json:"expiration_rate"`
+		FreezingRate   int     `json:"freezing_rate"`
+		Height         float32 `json:"height"`
+		Length         float32 `json:"length"`
+		Netweight      float32 `json:"netweight"`
+		ProductCode    string   `json:"product_code"`
+		RecomFreezTemp float32 `json:"recommended_freezing_temperature"`
+		Width          float32 `json:"width"`
+		ProductTypeID  int     `json:"product_type_id"`
+		SellerID       int     `json:"seller_id"`
 	}
 
 	type response struct {
+		Data string `json:"data"`
 	}
 
 	return func(c *gin.Context) {
+		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		if err != nil {
+			c.JSON(400, web.NewError(400, "invalid ID"))
+			return
+		}
 
+		var req request
+		if err := c.Bind(&req); err != nil {
+			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
+			return
+		}
+
+		ctx := context.Background()
+		prod, err :=  p.productService.Update(ctx, int(id), req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
+		if err != nil {
+			c.JSON(400, web.NewError(400, err.Error()))
+			return
+		}
+
+		c.JSON(200, prod)
 	}
 }
 
-func (w *Product) Delete() gin.HandlerFunc {
-	type request struct {
-	}
-
-	type response struct {
-	}
+func (p *Product) Delete() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		if err != nil {
+			c.JSON(400, web.NewError(400, "invalid ID"))
+			return
+		}
 
+		ctx := context.Background()
+		err =  p.productService.Delete(ctx, int(id))
+		if err != nil {
+			c.JSON(400, web.NewError(400, err.Error()))
+			return
+		}
+
+		c.JSON(200, web.NewError(200, "The product has been deleted"))
 	}
 }
