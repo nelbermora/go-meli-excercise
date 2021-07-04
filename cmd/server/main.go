@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/BenjaminBergerM/go-meli-exercise/cmd/server/handler"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/employee"
+	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/warehouse"
 	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
@@ -44,6 +47,19 @@ func main() {
 		employeesRoutes.POST("/", employeeHandler.Store())
 		employeesRoutes.PATCH("/:id", employeeHandler.Update())
 		employeesRoutes.DELETE("/:id", employeeHandler.Delete())
+
+	}
+	db, _ := sql.Open("sqlite3", "./meli.db")
+	productRepo := product.NewRepository(db)
+	productService := product.NewService(productRepo)
+	productHandler := handler.NewProduct(productService)
+	productRoutes := router.Group("/products")
+	{
+		productRoutes.GET("/", productHandler.GetAll())
+		productRoutes.GET("/:id", productHandler.Get())
+		productRoutes.POST("/", productHandler.Store())
+		productRoutes.PUT("/:id", productHandler.Update())
+		productRoutes.DELETE("/:id", productHandler.Delete())
 	}
 
 	router.Run()
