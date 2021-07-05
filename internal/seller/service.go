@@ -7,7 +7,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
-var UNIQUE = errors.New("There is a seller with same.")
+var UNIQUE = errors.New("The cid field has already been taken.")
 
 // Service encapsulates the business logic of a Seller.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
