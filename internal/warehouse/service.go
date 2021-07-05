@@ -7,7 +7,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
-var UNIQUE = errors.New("There is a seller with same.")
+var UNIQUE = errors.New("The warehouse_code field has already been taken.")
 
 // Service encapsulates the business logic of a Warehouse.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
