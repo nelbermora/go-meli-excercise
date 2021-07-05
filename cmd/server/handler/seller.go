@@ -53,18 +53,17 @@ func (s *Seller) Get() gin.HandlerFunc {
 			return
 		}
 		ctx := context.Background()
-		prod, err := s.sellerService.Get(ctx, int(id))
+		sel, err := s.sellerService.Get(ctx, int(id))
 		if err != nil {
 			c.JSON(404, web.NewError(404, "Seller not found"))
 			return
 		}
-		c.JSON(201, &response{prod})
+		c.JSON(201, &response{sel})
 	}
 }
 
 func (s *Seller) Store() gin.HandlerFunc {
 	type request struct {
-		SellerID    int    `json:"seller_id"`
 		CID         int    `json:"cid"`
 		CompanyName string `json:"company_name"`
 		Address     string `json:"address"`
@@ -81,10 +80,6 @@ func (s *Seller) Store() gin.HandlerFunc {
 
 		if err := c.Bind(&req); err != nil {
 			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
-			return
-		}
-		if req.SellerID == 0 {
-			c.JSON(422, web.NewError(422, "seller_id can not be empty"))
 			return
 		}
 		if req.CID == 0 {
@@ -109,13 +104,18 @@ func (s *Seller) Store() gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		product, err := s.sellerService.Store(ctx, req.SellerID, req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
+		sel, err := s.sellerService.Store(ctx, req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
-			c.JSON(500, web.NewError(500, err.Error()))
+			switch err {
+			case seller.UNIQUE:
+				c.JSON(409, web.NewError(409, err.Error()))
+			default:
+				c.JSON(500, web.NewError(500, err.Error()))
+			}
 			return
 		}
 
-		c.JSON(201, &response{product})
+		c.JSON(201, &response{sel})
 	}
 }
 
@@ -148,13 +148,13 @@ func (s *Seller) Update() gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		prod, err := s.sellerService.Update(ctx, int(id), req.SellerID, req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
+		sel, err := s.sellerService.Update(ctx, int(id), req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
 			c.JSON(400, web.NewError(400, err.Error()))
 			return
 		}
 
-		c.JSON(200, prod)
+		c.JSON(200, sel)
 	}
 }
 
@@ -174,6 +174,6 @@ func (s *Seller) Delete() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(200, web.NewError(200, "The product has been deleted"))
+		c.JSON(200, web.NewError(200, "The seller has been deleted"))
 	}
 }

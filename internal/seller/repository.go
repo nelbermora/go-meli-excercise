@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Seller, error)
 	Get(ctx context.Context, id int) (domain.Seller, error)
+	Exists(ctx context.Context, cid int) bool
 	Save(ctx context.Context, s domain.Seller) (int, error)
 	Update(ctx context.Context, s domain.Seller) error
 	Delete(ctx context.Context, id int) error
@@ -37,7 +38,7 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Seller, error) {
 
 	for rows.Next() {
 		s := domain.Seller{}
-		_ = rows.Scan(&s.ID, &s.SellerID, &s.CID, &s.CompanyName, &s.Address, &s.Telephone, &s.LocalityID)
+		_ = rows.Scan(&s.ID, &s.CID, &s.CompanyName, &s.Address, &s.Telephone, &s.LocalityID)
 		sellers = append(sellers, s)
 	}
 
@@ -49,7 +50,7 @@ func (r *repository) Get(ctx context.Context, id int) (domain.Seller, error) {
 	sqlStatement := `SELECT * FROM "main"."sellers" WHERE id=$1;`
 	row := r.db.QueryRow(sqlStatement, id)
 	s := domain.Seller{}
-	err := row.Scan(&s.ID, &s.SellerID, &s.CID, &s.CompanyName, &s.Address, &s.Telephone, &s.LocalityID)
+	err := row.Scan(&s.ID, &s.CID, &s.CompanyName, &s.Address, &s.Telephone, &s.LocalityID)
 	if err != nil {
 		return domain.Seller{}, err
 	}
@@ -57,14 +58,25 @@ func (r *repository) Get(ctx context.Context, id int) (domain.Seller, error) {
 	return s, nil
 }
 
+// Exists checks is theres a seller with the same seller id
+func (r *repository) Exists(ctx context.Context, cid int) bool {
+	sqlStatement := `SELECT cid FROM "main"."sellers" WHERE cid=$1;`
+	row := r.db.QueryRow(sqlStatement, cid)
+	err := row.Scan(&cid)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (r *repository) Save(ctx context.Context, s domain.Seller) (int, error) {
 
-	stmt, err := r.db.Prepare(`INSERT INTO "main"."sellers"("seller_id","cid","company_name","address","telephone","locality_id") VALUES (?,?,?,?,?,?)`)
+	stmt, err := r.db.Prepare(`INSERT INTO "main"."sellers"("cid","company_name","address","telephone","locality_id") VALUES (?,?,?,?,?)`)
 	if err != nil {
 		return 0, err
 	}
 
-	res, err := stmt.Exec(s.SellerID, s.CID, s.CompanyName, s.Address, s.Telephone, s.LocalityID)
+	res, err := stmt.Exec(s.CID, s.CompanyName, s.Address, s.Telephone, s.LocalityID)
 	if err != nil {
 		return 0, err
 	}
@@ -78,12 +90,12 @@ func (r *repository) Save(ctx context.Context, s domain.Seller) (int, error) {
 }
 
 func (r *repository) Update(ctx context.Context, s domain.Seller) error {
-	stmt, err := r.db.Prepare(`UPDATE "main"."sellers" SET "seller_id"=?, "cid"=?, "company_name"=?, "address"=?, "telephone"=?, "locality_id"=?  WHERE "id"=?`)
+	stmt, err := r.db.Prepare(`UPDATE "main"."sellers" SET "cid"=?, "company_name"=?, "address"=?, "telephone"=?, "locality_id"=?  WHERE "id"=?`)
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.Exec(s.SellerID, s.CID, s.CompanyName, s.Address, s.Telephone, s.LocalityID, s.ID)
+	res, err := stmt.Exec(s.CID, s.CompanyName, s.Address, s.Telephone, s.LocalityID, s.ID)
 	if err != nil {
 		return err
 	}

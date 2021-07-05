@@ -20,7 +20,7 @@ func main() {
 
 	warehouseService := warehouse.NewService()
 	warehouseHandler := handler.NewWarehouse(warehouseService)
-	warehousesRoutes := router.Group("/warehouses")
+	warehousesRoutes := router.Group("/api/v1/warehouses")
 	{
 		warehousesRoutes.GET("/", warehouseHandler.GetAll())
 		warehousesRoutes.GET("/:id", warehouseHandler.Get())
@@ -32,7 +32,7 @@ func main() {
 	sellerRepository := seller.NewRepository(db)
 	sellerService := seller.NewService(sellerRepository)
 	sellerHandler := handler.NewSeller(sellerService)
-	sellersRoutes := router.Group("/sellers")
+	sellersRoutes := router.Group("/api/v1/sellers")
 	{
 		sellersRoutes.GET("/", sellerHandler.GetAll())
 		sellersRoutes.GET("/:id", sellerHandler.Get())

@@ -2,7 +2,6 @@ package domain
 
 type Seller struct {
 	ID          int    `json:"id"`
-	SellerID    int    `json:"seller_id"`
 	CID         int    `json:"cid"`
 	CompanyName string `json:"company_name"`
 	Address     string `json:"address"`
