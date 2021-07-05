@@ -7,6 +7,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/employee"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
+	"github.com/BenjaminBergerM/go-meli-exercise/internal/section"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/seller"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/warehouse"
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,18 @@ func main() {
 		sellersRoutes.POST("/", sellerHandler.Store())
 		sellersRoutes.PATCH("/:id", sellerHandler.Update())
 		sellersRoutes.DELETE("/:id", sellerHandler.Delete())
+	}
+
+	sectionRepository := section.NewRepository(db)
+	sectionService := section.NewService(sectionRepository)
+	sectionHandler := handler.NewSection(sectionService)
+	sectionsRoutes := router.Group("/api/v1/sections")
+	{
+		sectionsRoutes.GET("/", sectionHandler.GetAll())
+		sectionsRoutes.GET("/:id", sectionHandler.Get())
+		sectionsRoutes.POST("/", sectionHandler.Store())
+		sectionsRoutes.PATCH("/:id", sectionHandler.Update())
+		sectionsRoutes.DELETE("/:id", sectionHandler.Delete())
 	}
 
 	buyerService := buyer.NewService()
