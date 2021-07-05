@@ -80,7 +80,8 @@ func main() {
 
 	}
 
-	buyerService := buyer.NewService()
+	buyerRepository := buyer.NewRepository(db)
+	buyerService := buyer.NewService(buyerRepository)
 	buyerHandler := handler.NewBuyer(buyerService)
 	buyersRoutes := router.Group("/api/v1/buyers")
 	{

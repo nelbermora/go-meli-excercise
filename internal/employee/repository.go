@@ -8,7 +8,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
-// Repository encapsulates the storage of a section.
+// Repository encapsulates the storage of a employee.
 type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Employee, error)
 	Get(ctx context.Context, cardNumberID string) (domain.Employee, error)

@@ -50,13 +50,13 @@ func (e *Employee) GetAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		ctx := context.Background()
-		products, err := e.employeeService.GetAll(ctx)
+		employees, err := e.employeeService.GetAll(ctx)
 		if err != nil {
 			c.JSON(404, web.NewError(404, err.Error()))
 			return
 		}
 
-		c.JSON(200, &response{products})
+		c.JSON(200, &response{employees})
 	}
 }
 
