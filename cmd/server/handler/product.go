@@ -111,12 +111,18 @@ func (p *Product) Store() gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		product, err := p.productService.Store(ctx, req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
+		prod, err := p.productService.Store(ctx, req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
-			c.JSON(500, web.NewError(500, "Internal server error"))
+			switch err {
+			case product.UNIQUE:
+				c.JSON(409, web.NewError(409, err.Error()))
+			default:
+				c.JSON(500, web.NewError(500, err.Error()))
+			}
+			return
 		}
 
-		c.JSON(201, &response{product})
+		c.JSON(201, &response{prod})
 	}
 }
 

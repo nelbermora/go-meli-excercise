@@ -2,9 +2,12 @@ package product
 
 import (
 	"context"
+	"errors"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
+
+var UNIQUE = errors.New("The product_code field has already been taken.")
 
 // Service encapsulates the business logic of a Product.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
@@ -37,6 +40,12 @@ func (s *service) GetAll(ctx context.Context) ([]domain.Product, error) {
 }
 
 func (s *service) Store(ctx context.Context, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error) {
+
+	exist := s.repository.Exists(ctx, productCode)
+	if exist {
+		return domain.Product{}, UNIQUE
+	}
+
 	p := domain.Product{
 		Description:    description,
 		ExpirationRate: expirationRate,
