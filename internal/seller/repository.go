@@ -58,7 +58,6 @@ func (r *repository) Get(ctx context.Context, id int) (domain.Seller, error) {
 	return s, nil
 }
 
-// Exists checks is theres a seller with the same seller id
 func (r *repository) Exists(ctx context.Context, cid int) bool {
 	sqlStatement := `SELECT cid FROM "main"."sellers" WHERE cid=$1;`
 	row := r.db.QueryRow(sqlStatement, cid)

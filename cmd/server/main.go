@@ -18,7 +18,8 @@ func main() {
 	db, _ := sql.Open("sqlite3", "./meli.db")
 	router := gin.Default()
 
-	warehouseService := warehouse.NewService()
+	warehouseRepository := warehouse.NewRepository(db)
+	warehouseService := warehouse.NewService(warehouseRepository)
 	warehouseHandler := handler.NewWarehouse(warehouseService)
 	warehousesRoutes := router.Group("/api/v1/warehouses")
 	{

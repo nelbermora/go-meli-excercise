@@ -36,7 +36,7 @@ func (s *Seller) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(201, &response{sellers})
+		c.JSON(200, &response{sellers})
 	}
 }
 
@@ -150,7 +150,7 @@ func (s *Seller) Update() gin.HandlerFunc {
 		ctx := context.Background()
 		sel, err := s.sellerService.Update(ctx, int(id), req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
-			c.JSON(400, web.NewError(400, err.Error()))
+			c.JSON(500, web.NewError(500, err.Error()))
 			return
 		}
 

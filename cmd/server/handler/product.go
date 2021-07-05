@@ -35,7 +35,7 @@ func (p *Product) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(201, &response{products})
+		c.JSON(200, &response{products})
 	}
 }
 
@@ -58,7 +58,7 @@ func (p *Product) Get() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(201, &response{prod})
+		c.JSON(200, &response{prod})
 	}
 }
 
@@ -156,7 +156,7 @@ func (p *Product) Update() gin.HandlerFunc {
 		ctx := context.Background()
 		prod, err := p.productService.Update(ctx, int(id), req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
-			c.JSON(400, web.NewError(400, err.Error()))
+			c.JSON(500, web.NewError(500, err.Error()))
 			return
 		}
 

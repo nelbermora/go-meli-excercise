@@ -3,7 +3,6 @@ package seller
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
@@ -43,7 +42,6 @@ func (s *service) GetAll(ctx context.Context) ([]domain.Seller, error) {
 func (s *service) Store(ctx context.Context, cid int, companyName, address, telephone string, localityID int) (domain.Seller, error) {
 
 	exist := s.repository.Exists(ctx, cid)
-	fmt.Println(exist)
 	if exist {
 		return domain.Seller{}, UNIQUE
 	}
@@ -66,10 +64,6 @@ func (s *service) Store(ctx context.Context, cid int, companyName, address, tele
 	return seller, nil
 }
 
-func (s *service) Delete(ctx context.Context, id int) error {
-	return s.repository.Delete(ctx, id)
-}
-
 func (s *service) Update(ctx context.Context, id, cid int, companyName, address, telephone string, localityID int) (domain.Seller, error) {
 	seller := domain.Seller{
 		ID:          id,
@@ -86,4 +80,8 @@ func (s *service) Update(ctx context.Context, id, cid int, companyName, address,
 	}
 
 	return seller, nil
+}
+
+func (s *service) Delete(ctx context.Context, id int) error {
+	return s.repository.Delete(ctx, id)
 }
