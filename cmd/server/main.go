@@ -55,20 +55,22 @@ func main() {
 		sectionsRoutes.DELETE("/:id", sectionHandler.Delete())
 	}
 
-	buyerService := buyer.NewService()
-	buyerHandler := handler.NewBuyer(buyerService)
-	buyersRoutes := router.Group("/buyers")
+	productRepo := product.NewRepository(db)
+	productService := product.NewService(productRepo)
+	productHandler := handler.NewProduct(productService)
+	productRoutes := router.Group("/api/v1/products")
 	{
-		buyersRoutes.GET("/", buyerHandler.GetAll())
-		buyersRoutes.GET("/:id", buyerHandler.Get())
-		buyersRoutes.POST("/", buyerHandler.Store())
-		buyersRoutes.PATCH("/:id", buyerHandler.Update())
-		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
+		productRoutes.GET("/", productHandler.GetAll())
+		productRoutes.GET("/:id", productHandler.Get())
+		productRoutes.POST("/", productHandler.Store())
+		productRoutes.PUT("/:id", productHandler.Update())
+		productRoutes.DELETE("/:id", productHandler.Delete())
 	}
 
-	employeeService := employee.NewService()
+	employeeRepository := employee.NewRepository(db)
+	employeeService := employee.NewService(employeeRepository)
 	employeeHandler := handler.NewEmployee(employeeService)
-	employeesRoutes := router.Group("/employees")
+	employeesRoutes := router.Group("/api/v1/employees")
 	{
 		employeesRoutes.GET("/", employeeHandler.GetAll())
 		employeesRoutes.GET("/:id", employeeHandler.Get())
@@ -78,16 +80,15 @@ func main() {
 
 	}
 
-	productRepo := product.NewRepository(db)
-	productService := product.NewService(productRepo)
-	productHandler := handler.NewProduct(productService)
-	productRoutes := router.Group("/products")
+	buyerService := buyer.NewService()
+	buyerHandler := handler.NewBuyer(buyerService)
+	buyersRoutes := router.Group("/api/v1/buyers")
 	{
-		productRoutes.GET("/", productHandler.GetAll())
-		productRoutes.GET("/:id", productHandler.Get())
-		productRoutes.POST("/", productHandler.Store())
-		productRoutes.PUT("/:id", productHandler.Update())
-		productRoutes.DELETE("/:id", productHandler.Delete())
+		buyersRoutes.GET("/", buyerHandler.GetAll())
+		buyersRoutes.GET("/:id", buyerHandler.Get())
+		buyersRoutes.POST("/", buyerHandler.Store())
+		buyersRoutes.PATCH("/:id", buyerHandler.Update())
+		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
 	}
 
 	router.Run()
