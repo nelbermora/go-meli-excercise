@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	"github.com/BenjaminBergerM/go-meli-exercise/pkg/web"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 type Product struct {
@@ -40,13 +41,12 @@ func (p *Product) GetAll() gin.HandlerFunc {
 
 func (p *Product) Get() gin.HandlerFunc {
 
-
 	type response struct {
 		Data domain.Product `json:"data"`
 	}
 
 	return func(c *gin.Context) {
-		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			c.JSON(400, web.NewError(400, "invalid ID"))
 			return
@@ -70,7 +70,7 @@ func (p *Product) Store() gin.HandlerFunc {
 		Height         float32 `json:"height"`
 		Length         float32 `json:"length"`
 		Netweight      float32 `json:"netweight"`
-		ProductCode    string     `json:"product_code"`
+		ProductCode    string  `json:"product_code"`
 		RecomFreezTemp float32 `json:"recommended_freezing_temperature"`
 		Width          float32 `json:"width"`
 		ProductTypeID  int     `json:"product_type_id"`
@@ -113,7 +113,7 @@ func (p *Product) Store() gin.HandlerFunc {
 		ctx := context.Background()
 		product, err := p.productService.Store(ctx, req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
-
+			c.JSON(500, web.NewError(500, "Internal server error"))
 		}
 
 		c.JSON(201, &response{product})
@@ -129,7 +129,7 @@ func (p *Product) Update() gin.HandlerFunc {
 		Height         float32 `json:"height"`
 		Length         float32 `json:"length"`
 		Netweight      float32 `json:"netweight"`
-		ProductCode    string   `json:"product_code"`
+		ProductCode    string  `json:"product_code"`
 		RecomFreezTemp float32 `json:"recommended_freezing_temperature"`
 		Width          float32 `json:"width"`
 		ProductTypeID  int     `json:"product_type_id"`
@@ -141,7 +141,7 @@ func (p *Product) Update() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			c.JSON(400, web.NewError(400, "invalid ID"))
 			return
@@ -154,7 +154,7 @@ func (p *Product) Update() gin.HandlerFunc {
 		}
 
 		ctx := context.Background()
-		prod, err :=  p.productService.Update(ctx, int(id), req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
+		prod, err := p.productService.Update(ctx, int(id), req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
 			c.JSON(400, web.NewError(400, err.Error()))
 			return
@@ -167,14 +167,14 @@ func (p *Product) Update() gin.HandlerFunc {
 func (p *Product) Delete() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		id, err := strconv.ParseInt(c.Param("id"),10, 64)
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			c.JSON(400, web.NewError(400, "invalid ID"))
 			return
 		}
 
 		ctx := context.Background()
-		err =  p.productService.Delete(ctx, int(id))
+		err = p.productService.Delete(ctx, int(id))
 		if err != nil {
 			c.JSON(400, web.NewError(400, err.Error()))
 			return

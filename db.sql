@@ -33,3 +33,20 @@ CREATE TABLE "products" (
     "id_product_type"	INTEGER,
     "id_seller"	INTEGER
 );
+
+create table sellers
+(
+    id           integer not null
+        constraint sellers_pk
+            primary key autoincrement,
+    seller_id    int     not null,
+    cid          int     not null,
+    company_name varchar not null,
+    address      varchar not null,
+    telephone    varchar not null,
+    locality_id  int     not null
+);
+
+create unique index sellers_id_uindex
+    on sellers (id);
+

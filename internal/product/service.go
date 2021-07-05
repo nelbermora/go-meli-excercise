@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
@@ -13,7 +14,7 @@ type Service interface {
 	Get(ctx context.Context, id int) (domain.Product, error)
 	GetAll(ctx context.Context) ([]domain.Product, error)
 	Store(ctx context.Context, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
-	Update(ctx context.Context,id int, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
+	Update(ctx context.Context, id int, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
 	Delete(ctx context.Context, id int) error
 }
 
@@ -37,17 +38,17 @@ func (s *service) GetAll(ctx context.Context) ([]domain.Product, error) {
 
 func (s *service) Store(ctx context.Context, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error) {
 	p := domain.Product{
-		Description: description,
+		Description:    description,
 		ExpirationRate: expirationRate,
-		FreezingRate: freezingRate,
-		Height: height,
-		Length: length,
-		Netweight: netweight,
-		ProductCode: productCode,
+		FreezingRate:   freezingRate,
+		Height:         height,
+		Length:         length,
+		Netweight:      netweight,
+		ProductCode:    productCode,
 		RecomFreezTemp: recomFreezTemp,
-		Width: width,
-		ProductTypeID: productTypeID,
-		SellerID: sellerID,
+		Width:          width,
+		ProductTypeID:  productTypeID,
+		SellerID:       sellerID,
 	}
 
 	id, err := s.repository.Save(ctx, p)
@@ -64,20 +65,20 @@ func (s *service) Delete(ctx context.Context, id int) error {
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *service) Update(ctx context.Context,id int, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error) {
+func (s *service) Update(ctx context.Context, id int, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error) {
 	p := domain.Product{
-		ID: id,
-		Description: description,
+		ID:             id,
+		Description:    description,
 		ExpirationRate: expirationRate,
-		FreezingRate: freezingRate,
-		Height: height,
-		Length: length,
-		Netweight: netweight,
-		ProductCode: productCode,
+		FreezingRate:   freezingRate,
+		Height:         height,
+		Length:         length,
+		Netweight:      netweight,
+		ProductCode:    productCode,
 		RecomFreezTemp: recomFreezTemp,
-		Width: width,
-		ProductTypeID: productTypeID,
-		SellerID: sellerID,
+		Width:          width,
+		ProductTypeID:  productTypeID,
+		SellerID:       sellerID,
 	}
 
 	err := s.repository.Update(ctx, p)
