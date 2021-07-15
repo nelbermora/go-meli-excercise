@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
@@ -79,9 +80,10 @@ func (s *Seller) Store() gin.HandlerFunc {
 		var req request
 
 		if err := c.Bind(&req); err != nil {
-			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
+			c.JSON(400, web.NewError(400, "json decoding: "+err.Error()))
 			return
 		}
+		fmt.Println(req)
 		if req.CID == 0 {
 			c.JSON(422, web.NewError(422, "cid can not be empty"))
 			return
