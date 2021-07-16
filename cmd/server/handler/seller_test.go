@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/seller"
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,10 @@ type sellerServiceMock struct{
 
 func (s *sellerServiceMock) Get(ctx context.Context, id int) (domain.Seller, error) {
 	args := s.Called(ctx, id)
-	return args.Get(0).(domain.Seller), args.Error(1)
+	if args.Get(0) != nil {
+		return args.Get(0).(domain.Seller), args.Error(1)
+	}
+	return domain.Seller{}, args.Error(1)
 }
 
 func (s *sellerServiceMock) GetAll(ctx context.Context) ([]domain.Seller, error) {
@@ -106,4 +110,53 @@ func TestSeller_Create_ErrCIDExist(t *testing.T) {
 	sellerHandler.Store()(c)
 	assert.Equal(t, 409, rr.Code)
 	assert.Equal(t, `{"code":"conflict","message":"The cid field has already been taken."}`, rr.Body.String())
+}
+
+func TestSeller_GetAll_OK(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, sellerAPIv + "/sellers", nil)
+	rr := httptest.NewRecorder()
+	s := []domain.Seller{{ID: 1, CID: 23, CompanyName: "test 1", Address: "a1", Telephone: "22", LocalityID: 2}, {ID: 2, CID: 33, CompanyName: "test 2", Address: "a2", Telephone: "44", LocalityID: 5}}
+	svcMock := &sellerServiceMock{}
+	svcMock.On("GetAll", req.Context()).Return(s, nil)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.GetAll()(c)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, `{"data":[{"id":1,"cid":23,"company_name":"test 1","address":"a1","telephone":"22","locality_id":2},{"id":2,"cid":33,"company_name":"test 2","address":"a2","telephone":"44","locality_id":5}]}`, rr.Body.String())
+}
+
+func TestSeller_Get_OK(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, sellerAPIv + "/sellers/1", nil)
+	rr := httptest.NewRecorder()
+	s := domain.Seller{ID: 1, CID: 23, CompanyName: "test 1", Address: "a1", Telephone: "22", LocalityID: 2}
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Get", req.Context(),1).Return(s, nil)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Get()(c)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, `{"data":{"id":1,"cid":23,"company_name":"test 1","address":"a1","telephone":"22","locality_id":2}}`, rr.Body.String())
+}
+
+func TestSeller_Get_Err(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, sellerAPIv + "/sellers/1", nil)
+	rr := httptest.NewRecorder()
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Get", req.Context(),1).Return(nil, errors.New(""))
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Get()(c)
+	assert.Equal(t, 404, rr.Code)
+	assert.Equal(t, `{"code":"not_found","message":"Seller not found"}`, rr.Body.String())
 }

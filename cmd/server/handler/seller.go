@@ -58,7 +58,7 @@ func (s *Seller) Get() gin.HandlerFunc {
 			c.JSON(404, web.NewError(404, "Seller not found"))
 			return
 		}
-		c.JSON(201, &response{sel})
+		c.JSON(200, &response{sel})
 	}
 }
 
