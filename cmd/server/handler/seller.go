@@ -152,8 +152,6 @@ func (s *Seller) Update() gin.HandlerFunc {
 		sel, err := s.sellerService.Update(ctx, int(id), req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
 			switch err {
-			case seller.UNIQUE:
-				c.JSON(409, web.NewError(409, err.Error()))
 			case seller.NOT_FOUND:
 				c.JSON(404, web.NewError(404, err.Error()))
 			default:

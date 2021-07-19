@@ -67,11 +67,6 @@ func (s *service) Store(ctx context.Context, cid int, companyName, address, tele
 
 func (s *service) Update(ctx context.Context, id, cid int, companyName, address, telephone string, localityID int) (domain.Seller, error) {
 
-	exist := s.repository.Exists(ctx, cid)
-	if exist {
-		return domain.Seller{}, UNIQUE
-	}
-
 	seller := domain.Seller{
 		ID:          id,
 		CID:         cid,
