@@ -42,7 +42,10 @@ func (s *sellerServiceMock) Store(ctx context.Context, cid int, companyName, add
 
 func (s *sellerServiceMock) Update(ctx context.Context, id, cid int, companyName, address, telephone string, localityID int) (domain.Seller, error) {
 	args := s.Called(ctx, id, cid, companyName, address, telephone, localityID)
-	return args.Get(0).(domain.Seller), args.Error(1)
+	if args.Get(0) != nil {
+		return args.Get(0).(domain.Seller), args.Error(1)
+	}
+	return domain.Seller{}, args.Error(1)
 }
 
 func (s *sellerServiceMock) Delete(ctx context.Context, id int) error {
@@ -159,4 +162,69 @@ func TestSeller_Get_Err(t *testing.T) {
 	sellerHandler.Get()(c)
 	assert.Equal(t, 404, rr.Code)
 	assert.Equal(t, `{"code":"not_found","message":"Seller not found"}`, rr.Body.String())
+}
+
+func TestSeller_Update_OK(t *testing.T) {
+	r := mockRequest{1,2,"test company", "test address", "1234", 1}
+	body, _ := json.Marshal(r)
+	req := httptest.NewRequest(http.MethodPost, sellerAPIv + "/sellers", bytes.NewReader(body))
+	rr := httptest.NewRecorder()
+	s := domain.Seller{ID: 1, CID: r.CID, CompanyName: r.CompanyName, Address: r.Address, Telephone: r.Telephone, LocalityID: r.LocalityID}
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Update", req.Context(), r.SellerID, r.CID, r.CompanyName, r.Address, r.Telephone, r.LocalityID).Return(s, nil)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Update()(c)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, `{"id":1,"cid":2,"company_name":"test company","address":"test address","telephone":"1234","locality_id":1}`, rr.Body.String())
+}
+
+func TestSeller_Update_Err(t *testing.T) {
+	r := mockRequest{1,2,"test company", "test address", "1234", 1}
+	body, _ := json.Marshal(r)
+	req := httptest.NewRequest(http.MethodPost, sellerAPIv + "/sellers", bytes.NewReader(body))
+	rr := httptest.NewRecorder()
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Update", req.Context(), r.SellerID, r.CID, r.CompanyName, r.Address, r.Telephone, r.LocalityID).Return(nil, seller.NOT_FOUND)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Update()(c)
+	assert.Equal(t, 404, rr.Code)
+	assert.Equal(t, `{"code":"not_found","message":"Seller not found."}`, rr.Body.String())
+}
+
+func TestSeller_Delete_OK(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPost, sellerAPIv + "/sellers/1", nil)
+	rr := httptest.NewRecorder()
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Delete", req.Context(), 1).Return(nil)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Delete()(c)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, `{"code":"ok","message":"The seller has been deleted"}`, rr.Body.String())
+}
+
+func TestSeller_Delete_Err(t *testing.T) {
+	req := httptest.NewRequest(http.MethodPost, sellerAPIv + "/sellers/1", nil)
+	rr := httptest.NewRecorder()
+	svcMock := &sellerServiceMock{}
+	svcMock.On("Delete", req.Context(), 1).Return(seller.NOT_FOUND)
+	c, _ := gin.CreateTestContext(rr)
+	c.Request = req
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
+	sellerHandler := NewSeller(svcMock)
+
+	sellerHandler.Delete()(c)
+	assert.Equal(t, 404, rr.Code)
+	assert.Equal(t, `{"code":"not_found","message":"Seller not found."}`, rr.Body.String())
 }

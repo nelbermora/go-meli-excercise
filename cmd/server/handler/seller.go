@@ -151,7 +151,14 @@ func (s *Seller) Update() gin.HandlerFunc {
 		ctx := context.Background()
 		sel, err := s.sellerService.Update(ctx, int(id), req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
-			c.JSON(500, web.NewError(500, err.Error()))
+			switch err {
+			case seller.UNIQUE:
+				c.JSON(409, web.NewError(409, err.Error()))
+			case seller.NOT_FOUND:
+				c.JSON(404, web.NewError(404, err.Error()))
+			default:
+				c.JSON(500, web.NewError(500, err.Error()))
+			}
 			return
 		}
 
@@ -171,9 +178,15 @@ func (s *Seller) Delete() gin.HandlerFunc {
 		ctx := context.Background()
 		err = s.sellerService.Delete(ctx, int(id))
 		if err != nil {
-			c.JSON(400, web.NewError(400, err.Error()))
+			switch err {
+			case seller.NOT_FOUND:
+				c.JSON(404, web.NewError(404, err.Error()))
+			default:
+				c.JSON(400, web.NewError(400, err.Error()))
+			}
 			return
 		}
+
 
 		c.JSON(200, web.NewError(200, "The seller has been deleted"))
 	}

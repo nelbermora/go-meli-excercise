@@ -3,8 +3,6 @@ package seller
 import (
 	"context"
 	"database/sql"
-	"errors"
-
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
@@ -104,7 +102,7 @@ func (r *repository) Update(ctx context.Context, s domain.Seller) error {
 		return err
 	}
 	if affect < 1 {
-		return errors.New("seller not found")
+		return NOT_FOUND
 	}
 
 	return nil
@@ -127,7 +125,7 @@ func (r *repository) Delete(ctx context.Context, id int) error {
 	}
 
 	if affect < 1 {
-		return errors.New("seller not found")
+		return NOT_FOUND
 	}
 
 	return nil
