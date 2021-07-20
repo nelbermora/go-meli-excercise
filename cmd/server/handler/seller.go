@@ -58,7 +58,7 @@ func (s *Seller) Get() gin.HandlerFunc {
 			c.JSON(404, web.NewError(404, "Seller not found"))
 			return
 		}
-		c.JSON(201, &response{sel})
+		c.JSON(200, &response{sel})
 	}
 }
 
@@ -78,10 +78,11 @@ func (s *Seller) Store() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req request
 
-		if err := c.Bind(&req); err != nil {
-			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(400, web.NewError(400, "json decoding: "+err.Error()))
 			return
 		}
+
 		if req.CID == 0 {
 			c.JSON(422, web.NewError(422, "cid can not be empty"))
 			return
@@ -142,7 +143,7 @@ func (s *Seller) Update() gin.HandlerFunc {
 		}
 
 		var req request
-		if err := c.Bind(&req); err != nil {
+		if err := c.BindJSON(&req); err != nil {
 			c.JSON(422, web.NewError(400, "json decoding: "+err.Error()))
 			return
 		}
@@ -150,7 +151,12 @@ func (s *Seller) Update() gin.HandlerFunc {
 		ctx := context.Background()
 		sel, err := s.sellerService.Update(ctx, int(id), req.CID, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		if err != nil {
-			c.JSON(500, web.NewError(500, err.Error()))
+			switch err {
+			case seller.NOT_FOUND:
+				c.JSON(404, web.NewError(404, err.Error()))
+			default:
+				c.JSON(500, web.NewError(500, err.Error()))
+			}
 			return
 		}
 
@@ -170,9 +176,15 @@ func (s *Seller) Delete() gin.HandlerFunc {
 		ctx := context.Background()
 		err = s.sellerService.Delete(ctx, int(id))
 		if err != nil {
-			c.JSON(400, web.NewError(400, err.Error()))
+			switch err {
+			case seller.NOT_FOUND:
+				c.JSON(404, web.NewError(404, err.Error()))
+			default:
+				c.JSON(400, web.NewError(400, err.Error()))
+			}
 			return
 		}
+
 
 		c.JSON(200, web.NewError(200, "The seller has been deleted"))
 	}

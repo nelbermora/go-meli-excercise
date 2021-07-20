@@ -8,6 +8,7 @@ import (
 )
 
 var UNIQUE = errors.New("The cid field has already been taken.")
+var NOT_FOUND = errors.New("Seller not found.")
 
 // Service encapsulates the business logic of a Seller.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
@@ -65,6 +66,7 @@ func (s *service) Store(ctx context.Context, cid int, companyName, address, tele
 }
 
 func (s *service) Update(ctx context.Context, id, cid int, companyName, address, telephone string, localityID int) (domain.Seller, error) {
+
 	seller := domain.Seller{
 		ID:          id,
 		CID:         cid,

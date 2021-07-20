@@ -159,6 +159,28 @@ func (p *Product) Update() gin.HandlerFunc {
 			return
 		}
 
+		if req.Height == 0 {
+			c.JSON(422, web.NewError(422, "height can not be empty"))
+			return
+		}
+		if req.Length == 0 {
+			c.JSON(422, web.NewError(422, "length can not be empty"))
+			return
+		}
+		if req.Netweight == 0 {
+			c.JSON(422, web.NewError(422, "netweight can not be empty"))
+			return
+		}
+
+		if req.Width == 0 {
+			c.JSON(422, web.NewError(422, "width can not be empty"))
+			return
+		}
+		if req.ProductCode == "" {
+			c.JSON(422, web.NewError(422, "product_code can not be empty"))
+			return
+		}
+
 		ctx := context.Background()
 		prod, err := p.productService.Update(ctx, int(id), req.Description, req.ProductCode, req.Height, req.Length, req.Netweight, req.RecomFreezTemp, req.Width, req.ProductTypeID, req.SellerID, req.ExpirationRate, req.FreezingRate)
 		if err != nil {
