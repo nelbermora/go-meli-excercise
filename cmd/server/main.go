@@ -5,6 +5,7 @@ import (
 
 	"github.com/BenjaminBergerM/go-meli-exercise/cmd/server/handler"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
+	"github.com/BenjaminBergerM/go-meli-exercise/internal/carry"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/employee"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/locality"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
@@ -99,8 +100,17 @@ func main() {
 	localitiesRoutes := router.Group("/api/v1/localities")
 	{
 		localitiesRoutes.POST("/", localitiesHandler.Store())
-		localitiesRoutes.GET("/reports/:id", localitiesHandler.GetSellersByLoc())
+		localitiesRoutes.GET("/reports", localitiesHandler.GetSellersByLoc())
+		localitiesRoutes.GET("/reportsCarries", localitiesHandler.GetCarriesByLoc())
 	}
 
-	router.Run()
+	carryRepository := carry.NewRepository(db)
+	carryService := carry.NewService(carryRepository, localitiesRepository)
+	carryHandler := handler.NewCarry(carryService)
+	carryRoutes := router.Group("/api/v1/carries")
+	{
+		carryRoutes.POST("/", carryHandler.Store())
+	}
+
+	router.Run(":18080")
 }

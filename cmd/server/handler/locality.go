@@ -75,19 +75,31 @@ func (l *Locality) GetSellersByLoc() gin.HandlerFunc {
 		Data interface{} `json:"data"`
 	}
 	return func(c *gin.Context) {
-		id := c.Param("id")
-		if id == "" {
-			c.JSON(422, web.NewError(422, "id must be distinct of null"))
-			return
-		}
-		intId, err := strconv.Atoi(id)
-		if err != nil {
-			c.JSON(422, web.NewError(422, "invalid Id"))
-			return
-		}
+		id := c.Query("id")
+
+		intId, _ := strconv.Atoi(id)
 
 		ctx := context.Background()
 		rep, err := l.localotyService.GetSellersByLoc(ctx, intId)
+		if err != nil {
+			c.JSON(404, web.NewError(404, "locality not found"))
+			return
+		}
+		c.JSON(200, &response{rep})
+	}
+}
+
+func (l *Locality) GetCarriesByLoc() gin.HandlerFunc {
+	type response struct {
+		Data interface{} `json:"data"`
+	}
+	return func(c *gin.Context) {
+		id := c.Query("id")
+
+		intId, _ := strconv.Atoi(id)
+
+		ctx := context.Background()
+		rep, err := l.localotyService.GetCarriesByLoc(ctx, intId)
 		if err != nil {
 			c.JSON(404, web.NewError(404, "locality not found"))
 			return
