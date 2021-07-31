@@ -193,3 +193,22 @@ func (s *Section) Delete() gin.HandlerFunc {
 		c.JSON(200, web.NewError(200, "The section has been deleted"))
 	}
 }
+
+func (s *Section) GetBatchesBySection() gin.HandlerFunc {
+	type response struct {
+		Data interface{} `json:"data"`
+	}
+	return func(c *gin.Context) {
+		id := c.Query("id")
+
+		intId, _ := strconv.Atoi(id)
+
+		ctx := context.Background()
+		rep, err := s.sectionService.GetBatchesBySection(ctx, intId)
+		if err != nil {
+			c.JSON(404, web.NewError(404, "locality not found"))
+			return
+		}
+		c.JSON(200, &response{rep})
+	}
+}

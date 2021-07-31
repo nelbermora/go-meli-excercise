@@ -13,9 +13,11 @@ type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Section, error)
 	Get(ctx context.Context, id int) (domain.Section, error)
 	Exists(ctx context.Context, cid int) bool
+	ExistsById(ctx context.Context, sectionId int) bool
 	Save(ctx context.Context, s domain.Section) (int, error)
 	Update(ctx context.Context, s domain.Section) error
 	Delete(ctx context.Context, id int) error
+	GetProductBatchBySection(ctx context.Context, id int) ([]domain.Section, error)
 }
 
 type repository struct {
@@ -66,6 +68,13 @@ func (r *repository) Exists(ctx context.Context, sectionNumber int) bool {
 		return false
 	}
 	return true
+}
+
+func (r *repository) ExistsById(ctx context.Context, sectionId int) bool {
+	sqlStatement := `SELECT id FROM "main"."sections" WHERE id=$1;`
+	row := r.db.QueryRow(sqlStatement, sectionId)
+	err := row.Scan(&sectionId)
+	return err == nil
 }
 
 func (r *repository) Save(ctx context.Context, s domain.Section) (int, error) {
@@ -131,4 +140,32 @@ func (r *repository) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (r *repository) GetProductBatchBySection(ctx context.Context, id int) ([]domain.Section, error) {
+	queryProdBatchesBySection := `SELECT s.*,(
+										SELECT count(id)
+										FROM product_batches
+										WHERE product_batches.section_id = s.id) as cant 
+							  FROM sections s
+							 WHERE s.id = IFNULL(?,s.ID)`
+	var sections []domain.Section
+	var rows *sql.Rows
+	var err error
+	if id > 0 {
+		rows, err = r.db.Query(queryProdBatchesBySection, id)
+	} else {
+		rows, err = r.db.Query(queryProdBatchesBySection, nil)
+	}
+
+	for rows.Next() {
+		l := domain.Section{}
+		err = rows.Scan(&l.ID, &l.SectionNumber, &l.CurrentTemperature, &l.MinimumTemperature, &l.CurrentCapacity, &l.MinimumCapacity, &l.MaximumCapacity, &l.WarehouseID, &l.ProductTypeID, &l.ProductBatchesCount)
+		sections = append(sections, l)
+	}
+
+	if err != nil {
+		return sections, err
+	}
+	return sections, nil
 }

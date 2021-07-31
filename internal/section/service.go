@@ -19,6 +19,7 @@ type Service interface {
 	Store(ctx context.Context, sectionNumber, currentTemperature, minTemperature, currentCapacity, minCapacity, maxCapacity, warehouseID, ProductTypeID int) (domain.Section, error)
 	Update(ctx context.Context, id, sectionNumber, currentTemperature, minTemperature, currentCapacity, minCapacity, maxCapacity, warehouseID, productTypeID int) (domain.Section, error)
 	Delete(ctx context.Context, id int) error
+	GetBatchesBySection(ctx context.Context, id int) ([]domain.Section, error)
 }
 
 type service struct {
@@ -90,4 +91,17 @@ func (s *service) Update(ctx context.Context, id, sectionNumber, currentTemperat
 
 func (s *service) Delete(ctx context.Context, id int) error {
 	return s.repository.Delete(ctx, id)
+}
+
+func (s *service) GetBatchesBySection(ctx context.Context, id int) ([]domain.Section, error) {
+	result := []domain.Section{}
+	if !s.repository.ExistsById(ctx, id) && id > 0 {
+		return result, errors.New("section Id not found")
+	}
+
+	result, err := s.repository.GetProductBatchBySection(ctx, id)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }

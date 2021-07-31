@@ -120,3 +120,17 @@ CREATE TABLE "carries" (
 	"id"	INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+
+CREATE TABLE "product_batches" (
+	"id"	INTEGER,
+	"batch_number"	TEXT,
+	"current_quantity"	INTEGER,
+	"current_temperature"	NUMERIC,
+	"due_date"	TEXT ,
+    "initial_quantity" INTEGER,
+	"manufacturing_date"	TEXT,
+    "minimum_temperature" NUMERIC,
+    "product_id" INTEGER,
+    "section_id" INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

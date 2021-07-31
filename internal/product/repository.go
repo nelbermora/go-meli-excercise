@@ -13,6 +13,7 @@ type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Product, error)
 	Get(ctx context.Context, id int) (domain.Product, error)
 	Exists(ctx context.Context, productCode string) bool
+	ExistsById(ctx context.Context, productId int) bool
 	Save(ctx context.Context, p domain.Product) (int, error)
 	Update(ctx context.Context, p domain.Product) error
 	Delete(ctx context.Context, id int) error
@@ -66,6 +67,13 @@ func (r *repository) Exists(ctx context.Context, productCode string) bool {
 		return false
 	}
 	return true
+}
+
+func (r *repository) ExistsById(ctx context.Context, productId int) bool {
+	sqlStatement := `SELECT id FROM "main"."products" WHERE id=$1;`
+	row := r.db.QueryRow(sqlStatement, productId)
+	err := row.Scan(&productId)
+	return err == nil
 }
 
 func (r *repository) Save(ctx context.Context, p domain.Product) (int, error) {
