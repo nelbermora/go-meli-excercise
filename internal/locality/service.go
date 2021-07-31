@@ -12,7 +12,8 @@ var ErrNotFound = errors.New("locality_id not exists")
 
 type Service interface {
 	Store(ctx context.Context, id int, name, province, country string) (domain.Locality, error)
-	GetSellersByLoc(ctx context.Context, id int) (domain.Locality, error)
+	GetSellersByLoc(ctx context.Context, id int) ([]domain.Locality, error)
+	GetCarriesByLoc(ctx context.Context, id int) ([]domain.Locality, error)
 }
 
 type service struct {
@@ -45,23 +46,30 @@ func (s *service) Store(ctx context.Context, id int, name, province, country str
 	return locality, nil
 }
 
-func (s *service) GetSellersByLoc(ctx context.Context, id int) (domain.Locality, error) {
+func (s *service) GetCarriesByLoc(ctx context.Context, id int) ([]domain.Locality, error) {
 	// checking if locality exists
-	if !s.repository.Exists(ctx, id) {
-		return domain.Locality{}, ErrNotFound
+	result := []domain.Locality{}
+	if !s.repository.Exists(ctx, id) && id > 0 {
+		return result, ErrNotFound
 	}
-	l, err := s.repository.GetSellersByLoc(ctx, id)
+
+	result, err := s.repository.GetCarriesByLoc(ctx, id)
 	if err != nil {
-		// if locality exists, but repository returns nothing, so locality has 0 sellers
-		// looking for locality info
-		l, err = s.repository.Get(ctx, id)
-		if err != nil {
-			return domain.Locality{}, err
-		}
-		// setting seller_count = 0
-		count := 0
-		l.Sellers = &count
-		return l, nil
+		return result, err
 	}
-	return l, nil
+	return result, nil
+}
+
+func (s *service) GetSellersByLoc(ctx context.Context, id int) ([]domain.Locality, error) {
+	// checking if locality exists
+	result := []domain.Locality{}
+	if !s.repository.Exists(ctx, id) && id > 0 {
+		return result, ErrNotFound
+	}
+
+	result, err := s.repository.GetSellersByLoc(ctx, id)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }

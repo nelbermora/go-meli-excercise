@@ -109,3 +109,14 @@ CREATE TABLE "localities" (
 	"country_name"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+
+CREATE TABLE "carries" (
+	"cid"	TEXT,
+	"company_name"	TEXT,
+	"address"	TEXT,
+	"telephone"	TEXT,
+	"locality_id"	INTEGER NOT NULL,
+    "batch_number" INTEGER,
+	"id"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

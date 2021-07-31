@@ -6,4 +6,5 @@ type Locality struct {
 	Province string `json:"province_name"`
 	Country  string `json:"country_name"`
 	Sellers  *int   `json:"sellers_count,omitempty"`
+	Carries  *int   `json:"carries_count,omitempty"`
 }
