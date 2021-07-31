@@ -102,3 +102,10 @@ create table warehouses
 create unique index warehouses_id_uindex
     on warehouses (id);
 
+CREATE TABLE "localities" (
+	"id"	INTEGER,
+	"locality_name"	TEXT,
+	"province_name"	TEXT,
+	"country_name"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

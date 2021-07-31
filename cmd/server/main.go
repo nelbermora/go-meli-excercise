@@ -6,6 +6,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/cmd/server/handler"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/employee"
+	"github.com/BenjaminBergerM/go-meli-exercise/internal/locality"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/section"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/seller"
@@ -90,6 +91,15 @@ func main() {
 		buyersRoutes.POST("/", buyerHandler.Store())
 		buyersRoutes.PATCH("/:id", buyerHandler.Update())
 		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
+	}
+
+	localitiesRepository := locality.NewRepository(db)
+	localitiesService := locality.NewService(localitiesRepository)
+	localitiesHandler := handler.NewLocality(localitiesService)
+	localitiesRoutes := router.Group("/api/v1/localities")
+	{
+		localitiesRoutes.POST("/", localitiesHandler.Store())
+		localitiesRoutes.GET("/reports/:id", localitiesHandler.GetSellersByLoc())
 	}
 
 	router.Run()
