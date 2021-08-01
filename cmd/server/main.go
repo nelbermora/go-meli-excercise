@@ -97,6 +97,7 @@ func main() {
 		buyersRoutes.POST("/", buyerHandler.Store())
 		buyersRoutes.PATCH("/:id", buyerHandler.Update())
 		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
+		buyersRoutes.GET("/reportPurchaseOrders", buyerHandler.GetPurchaseByBuyer())
 	}
 
 	localitiesRepository := locality.NewRepository(db)

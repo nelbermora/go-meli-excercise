@@ -9,6 +9,8 @@ import (
 
 var UNIQUE = errors.New("The card_number_id field has already been taken.")
 
+var ErrNotFound = errors.New("buyer_id not exists")
+
 // Service encapsulates the business logic of a buyer.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
 // since the underlying concrete implementation does not export any other method that is not in the interface,
@@ -19,6 +21,7 @@ type Service interface {
 	Store(ctx context.Context, cardNumberID, firstName, lastName string) (domain.Buyer, error)
 	Update(ctx context.Context, cardNumberID, firstName, lastName string) (domain.Buyer, error)
 	Delete(ctx context.Context, cardNumberID string) error
+	GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.Buyer, error)
 }
 
 type service struct {
@@ -80,4 +83,18 @@ func (s *service) Update(ctx context.Context, cardNumberID, firstName, lastName 
 
 func (s *service) Delete(ctx context.Context, cardNumberID string) error {
 	return s.repository.Delete(ctx, cardNumberID)
+}
+
+func (s *service) GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.Buyer, error) {
+	// checking if locality exists
+	result := []domain.Buyer{}
+	if !s.repository.ExistsById(ctx, id) && id > 0 {
+		return result, ErrNotFound
+	}
+
+	result, err := s.repository.GetPurchaseByBuyer(ctx, id)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }

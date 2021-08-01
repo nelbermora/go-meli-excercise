@@ -17,6 +17,7 @@ type Repository interface {
 	Save(ctx context.Context, b domain.Buyer) (int, error)
 	Update(ctx context.Context, b domain.Buyer) error
 	Delete(ctx context.Context, cardNumberID string) error
+	GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.Buyer, error)
 }
 
 type repository struct {
@@ -143,3 +144,34 @@ func (r *repository) Delete(ctx context.Context, cardNumberID string) error {
 
 	return nil
 }
+
+func (r *repository) GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.Buyer, error) {
+	ProdsByPurchase := `SELECT b.*,(
+								SELECT count(id)
+								FROM purchase_orders
+								WHERE purchase_orders.buyer_id = b.id) as cant 
+						FROM buyers b
+					   WHERE b.id = IFNULL(?,b.id)`
+	var rows *sql.Rows
+	var err error
+	if id > 0 {
+		rows, err = r.db.Query(ProdsByPurchase, id)
+	} else {
+		rows, err = r.db.Query(ProdsByPurchase, nil)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var buyers []domain.Buyer
+
+	for rows.Next() {
+		b := domain.Buyer{}
+		_ = rows.Scan(&b.ID, &b.CardNumberID, &b.FirstName, &b.LastName, &b.PurchaseOrdersCount)
+		buyers = append(buyers, b)
+	}
+
+	return buyers, nil
+}
+
