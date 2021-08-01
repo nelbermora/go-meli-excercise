@@ -13,6 +13,7 @@ type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Buyer, error)
 	Get(ctx context.Context, cardNumberID string) (domain.Buyer, error)
 	Exists(ctx context.Context, cardNumberID string) bool
+	ExistsById(ctx context.Context, id int) bool
 	Save(ctx context.Context, b domain.Buyer) (int, error)
 	Update(ctx context.Context, b domain.Buyer) error
 	Delete(ctx context.Context, cardNumberID string) error
@@ -62,6 +63,16 @@ func (r *repository) Exists(ctx context.Context, cardNumberID string) bool {
 	sqlStatement := `SELECT card_number_id FROM "main"."buyers" WHERE card_number_id=$1;`
 	row := r.db.QueryRow(sqlStatement, cardNumberID)
 	err := row.Scan(&cardNumberID)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (r *repository) ExistsById(ctx context.Context, id int) bool {
+	sqlStatement := `SELECT id FROM "main"."buyers" WHERE id=$1;`
+	row := r.db.QueryRow(sqlStatement, id)
+	err := row.Scan(&id)
 	if err != nil {
 		return false
 	}

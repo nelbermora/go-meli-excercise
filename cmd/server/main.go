@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	purchaseorder "github.com/BenjaminBergerM/go-meli-exercise/internal/purchase_order"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/cmd/server/handler"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
@@ -131,6 +132,15 @@ func main() {
 	{
 		recordRoutes.POST("/", recordHandler.Store())
 	}
+
+	purchaseRepo := purchaseorder.NewRepository(db)
+	purchaseSvc := purchaseorder.NewService(purchaseRepo, buyerRepository)
+	purchaseHandler := handler.NewPurchaseOrder(purchaseSvc)
+	purchaseRoutes := router.Group("/api/v1/purchaseOrders")
+	{
+		purchaseRoutes.POST("/", purchaseHandler.Store())
+	}
+
 
 	router.Run()
 }

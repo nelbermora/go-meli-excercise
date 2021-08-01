@@ -143,3 +143,14 @@ CREATE TABLE "product_records" (
     "product_id" INTEGER,
     PRIMARY KEY("id" AUTOINCREMENT)
 );
+
+CREATE TABLE "purchase_orders"
+(
+    "id"                INTEGER,
+    "order_number"      TEXT,
+    "order_date"        TEXT,
+    "buyer_id"          INTEGER,
+    "product_record_id" INTEGER,
+    "order_status_id"   INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
+);
