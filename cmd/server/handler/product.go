@@ -211,3 +211,26 @@ func (p *Product) Delete() gin.HandlerFunc {
 		c.JSON(200, web.NewError(200, "The product has been deleted"))
 	}
 }
+
+func (p *Product) GetProductsByRecord() gin.HandlerFunc {
+	type response struct {
+		Data []domain.Product `json:"data"`
+	}
+	return func(c *gin.Context) {
+		id := c.Query("id")
+		intId, _ := strconv.Atoi(id)
+		ctx := context.Background()
+		rep, err := p.productService.GetByRecord(ctx, intId)
+		if err != nil {
+			switch err {
+			case product.ErrProdExistance:
+				c.JSON(404, web.NewError(404, "product not found"))
+				return
+			default:
+				c.JSON(500, web.NewError(500, err.Error()))
+				return
+			}
+		}
+		c.JSON(200, &response{rep})
+	}
+}

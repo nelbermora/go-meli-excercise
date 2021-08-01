@@ -17,6 +17,7 @@ type Repository interface {
 	Save(ctx context.Context, p domain.Product) (int, error)
 	Update(ctx context.Context, p domain.Product) error
 	Delete(ctx context.Context, id int) error
+	GetByRecord(ctx context.Context, id int) ([]domain.Product, error)
 }
 
 type repository struct {
@@ -139,4 +140,34 @@ func (r *repository) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+func (r *repository) GetByRecord(ctx context.Context, id int) ([]domain.Product, error) {
+	ProdsByRecord := `SELECT p.*,(
+								SELECT count(id)
+								FROM product_records
+								WHERE product_records.product_id = p.id) as cant 
+						FROM products p
+					   WHERE p.id = IFNULL(?,p.id)`
+	var rows *sql.Rows
+	var err error
+	if id > 0 {
+		rows, err = r.db.Query(ProdsByRecord, id)
+	} else {
+		rows, err = r.db.Query(ProdsByRecord, nil)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var products []domain.Product
+
+	for rows.Next() {
+		p := domain.Product{}
+		_ = rows.Scan(&p.ID, &p.Description, &p.ExpirationRate, &p.FreezingRate, &p.Height, &p.Length, &p.Netweight, &p.ProductCode, &p.RecomFreezTemp, &p.Width, &p.ProductTypeID, &p.SellerID, &p.RecordsCount)
+		products = append(products, p)
+	}
+
+	return products, nil
 }

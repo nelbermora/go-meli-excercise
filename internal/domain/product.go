@@ -14,4 +14,5 @@ type Product struct {
 	Width          float32 `json:"width"`
 	ProductTypeID  int     `json:"product_type_id"`
 	SellerID       int     `json:"seller_id"`
+	RecordsCount   int     `json:"records_count,omitempty"`
 }

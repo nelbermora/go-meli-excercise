@@ -134,3 +134,12 @@ CREATE TABLE "product_batches" (
     "section_id" INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+
+CREATE TABLE "product_records" (
+    "id" INTEGER,
+    "last_update_date" TEXT,
+    "purchase_price" NUMERIC,
+    "sale_price" NUMERIC,
+    "product_id" INTEGER,
+    PRIMARY KEY("id" AUTOINCREMENT)
+);

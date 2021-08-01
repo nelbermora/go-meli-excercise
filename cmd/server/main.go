@@ -10,6 +10,7 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/locality"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/product"
 	productbatch "github.com/BenjaminBergerM/go-meli-exercise/internal/product_batch"
+	productrecord "github.com/BenjaminBergerM/go-meli-exercise/internal/product_record"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/section"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/seller"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/warehouse"
@@ -69,6 +70,7 @@ func main() {
 		productRoutes.POST("/", productHandler.Store())
 		productRoutes.PUT("/:id", productHandler.Update())
 		productRoutes.DELETE("/:id", productHandler.Delete())
+		productRoutes.GET("/reportRecords", productHandler.GetProductsByRecord())
 	}
 
 	employeeRepository := employee.NewRepository(db)
@@ -120,6 +122,14 @@ func main() {
 	batchRoutes := router.Group("/api/v1/productBatches")
 	{
 		batchRoutes.POST("/", batchHandler.Store())
+	}
+
+	recordRepo := productrecord.NewRepository(db)
+	recordSvc := productrecord.NewService(recordRepo, productRepo)
+	recordHandler := handler.NewProductRecord(recordSvc)
+	recordRoutes := router.Group("/api/v1/productRecords")
+	{
+		recordRoutes.POST("/", recordHandler.Store())
 	}
 
 	router.Run()

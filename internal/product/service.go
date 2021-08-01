@@ -7,7 +7,10 @@ import (
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 )
 
-var UNIQUE = errors.New("The product_code field has already been taken.")
+var (
+	UNIQUE           = errors.New("The product_code field has already been taken.")
+	ErrProdExistance = errors.New("product_id does not exist")
+)
 
 // Service encapsulates the business logic of a Product.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
@@ -19,6 +22,7 @@ type Service interface {
 	Store(ctx context.Context, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
 	Update(ctx context.Context, id int, description, productCode string, height, length, netweight, recomFreezTemp, width float32, productTypeID, sellerID, expirationRate, freezingRate int) (domain.Product, error)
 	Delete(ctx context.Context, id int) error
+	GetByRecord(ctx context.Context, id int) ([]domain.Product, error)
 }
 
 type service struct {
@@ -96,4 +100,15 @@ func (s *service) Update(ctx context.Context, id int, description, productCode s
 	}
 
 	return p, nil
+}
+
+func (s *service) GetByRecord(ctx context.Context, id int) ([]domain.Product, error) {
+	products, err := s.repository.GetByRecord(ctx, id)
+	if err != nil {
+		return []domain.Product{}, err
+	}
+	if len(products) == 0 {
+		return products, ErrProdExistance
+	}
+	return products, nil
 }
