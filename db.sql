@@ -102,44 +102,71 @@ create table warehouses
 create unique index warehouses_id_uindex
     on warehouses (id);
 
-CREATE TABLE "localities" (
-	"id"	INTEGER,
-	"locality_name"	TEXT,
-	"province_name"	TEXT,
-	"country_name"	TEXT,
-	PRIMARY KEY("id" AUTOINCREMENT)
+CREATE TABLE "localities"
+(
+    "id"            INTEGER,
+    "locality_name" TEXT,
+    "province_name" TEXT,
+    "country_name"  TEXT,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "carries" (
-	"cid"	TEXT,
-	"company_name"	TEXT,
-	"address"	TEXT,
-	"telephone"	TEXT,
-	"locality_id"	INTEGER NOT NULL,
+CREATE TABLE "carries"
+(
+    "cid"          TEXT,
+    "company_name" TEXT,
+    "address"      TEXT,
+    "telephone"    TEXT,
+    "locality_id"  INTEGER NOT NULL,
     "batch_number" INTEGER,
-	"id"	INTEGER,
-	PRIMARY KEY("id" AUTOINCREMENT)
+    "id"           INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "product_batches" (
-	"id"	INTEGER,
-	"batch_number"	TEXT,
-	"current_quantity"	INTEGER,
-	"current_temperature"	NUMERIC,
-	"due_date"	TEXT ,
-    "initial_quantity" INTEGER,
-	"manufacturing_date"	TEXT,
+CREATE TABLE "product_batches"
+(
+    "id"                  INTEGER,
+    "batch_number"        TEXT,
+    "current_quantity"    INTEGER,
+    "current_temperature" NUMERIC,
+    "due_date"            TEXT,
+    "initial_quantity"    INTEGER,
+    "manufacturing_date"  TEXT,
     "minimum_temperature" NUMERIC,
-    "product_id" INTEGER,
-    "section_id" INTEGER,
-	PRIMARY KEY("id" AUTOINCREMENT)
+    "product_id"          INTEGER,
+    "section_id"          INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );
 
-CREATE TABLE "product_records" (
-    "id" INTEGER,
+CREATE TABLE "product_records"
+(
+    "id"               INTEGER,
     "last_update_date" TEXT,
-    "purchase_price" NUMERIC,
-    "sale_price" NUMERIC,
-    "product_id" INTEGER,
-    PRIMARY KEY("id" AUTOINCREMENT)
+    "purchase_price"   NUMERIC,
+    "sale_price"       NUMERIC,
+    "product_id"       INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
+);
+
+CREATE TABLE "purchase_orders"
+(
+    "id"                INTEGER,
+    "order_number"      TEXT,
+    "order_date"        TEXT,
+    "tracking_code"     TEXT,
+    "buyer_id"          INTEGER,
+    "product_record_id" INTEGER,
+    "order_status_id"   INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
+);
+
+CREATE TABLE "inbound_orders"
+(
+    "id"               INTEGER,
+    "order_date"       TEXT,
+    "order_number"     TEXT,
+    "employee_id"      INTEGER,
+    "product_batch_id" INTEGER,
+    "warehouse_id"     INTEGER,
+    PRIMARY KEY ("id" AUTOINCREMENT)
 );

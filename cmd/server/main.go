@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	inboundorder "github.com/BenjaminBergerM/go-meli-exercise/internal/inbound_order"
+	purchaseorder "github.com/BenjaminBergerM/go-meli-exercise/internal/purchase_order"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/cmd/server/handler"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
@@ -83,7 +85,7 @@ func main() {
 		employeesRoutes.POST("/", employeeHandler.Store())
 		employeesRoutes.PATCH("/:id", employeeHandler.Update())
 		employeesRoutes.DELETE("/:id", employeeHandler.Delete())
-
+		employeesRoutes.GET("/reportInboundOrders", employeeHandler.GetInboundOrdersByEmployee())
 	}
 
 	buyerRepository := buyer.NewRepository(db)
@@ -96,6 +98,7 @@ func main() {
 		buyersRoutes.POST("/", buyerHandler.Store())
 		buyersRoutes.PATCH("/:id", buyerHandler.Update())
 		buyersRoutes.DELETE("/:id", buyerHandler.Delete())
+		buyersRoutes.GET("/reportPurchaseOrders", buyerHandler.GetPurchaseByBuyer())
 	}
 
 	localitiesRepository := locality.NewRepository(db)
@@ -131,6 +134,23 @@ func main() {
 	{
 		recordRoutes.POST("/", recordHandler.Store())
 	}
+
+	purchaseRepo := purchaseorder.NewRepository(db)
+	purchaseSvc := purchaseorder.NewService(purchaseRepo, buyerRepository)
+	purchaseHandler := handler.NewPurchaseOrder(purchaseSvc)
+	purchaseRoutes := router.Group("/api/v1/purchaseOrders")
+	{
+		purchaseRoutes.POST("/", purchaseHandler.Store())
+	}
+
+	inboundOrderRepo := inboundorder.NewRepository(db)
+	inboundOrderSvc := inboundorder.NewService(inboundOrderRepo, employeeRepository)
+	inboundOrderHandler := handler.NewInboundOrder(inboundOrderSvc)
+	inboundOrderRoutes := router.Group("/api/v1/inboundOrders")
+	{
+		inboundOrderRoutes.POST("/", inboundOrderHandler.Store())
+	}
+
 
 	router.Run()
 }

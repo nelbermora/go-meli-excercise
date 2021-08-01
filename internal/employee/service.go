@@ -8,6 +8,8 @@ import (
 )
 
 var UNIQUE = errors.New("The card_number_id field has already been taken.")
+var ErrNotFound = errors.New("employee_id not exists")
+
 
 // Service encapsulates the business logic of a employee.
 // As stated by this principle https://golang.org/doc/effective_go#generality,
@@ -19,6 +21,7 @@ type Service interface {
 	Store(ctx context.Context, cardNumberID, firstName, lastName string, warehouseID int) (domain.Employee, error)
 	Update(ctx context.Context, cardNumberID, firstName, lastName string, warehouseID int) (domain.Employee, error)
 	Delete(ctx context.Context, cardNumberID string) error
+	GetInboundOrdersByEmployee(ctx context.Context, id int) ([]domain.Employee, error)
 }
 
 type service struct {
@@ -82,4 +85,17 @@ func (s *service) Update(ctx context.Context, cardNumberID, firstName, lastName 
 
 func (s *service) Delete(ctx context.Context, cardNumberID string) error {
 	return s.repository.Delete(ctx, cardNumberID)
+}
+
+func (s *service) GetInboundOrdersByEmployee(ctx context.Context, id int) ([]domain.Employee, error) {
+	result := []domain.Employee{}
+	if !s.repository.ExistsById(ctx, id) && id > 0 {
+		return result, ErrNotFound
+	}
+
+	result, err := s.repository.GetInboundOrdersByEmployee(ctx, id)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }

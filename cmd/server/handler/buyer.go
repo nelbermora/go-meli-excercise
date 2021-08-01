@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/buyer"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
@@ -163,5 +164,24 @@ func (b *Buyer) Delete() gin.HandlerFunc {
 		}
 
 		c.JSON(200, web.NewError(200, "The employee has been deleted"))
+	}
+}
+
+func (b *Buyer) GetPurchaseByBuyer() gin.HandlerFunc {
+	type response struct {
+		Data interface{} `json:"data"`
+	}
+	return func(c *gin.Context) {
+		id := c.Query("id")
+
+		intId, _ := strconv.Atoi(id)
+
+		ctx := context.Background()
+		rep, err := b.buyerService.GetPurchaseByBuyer(ctx, intId)
+		if err != nil {
+			c.JSON(404, web.NewError(404, "buyer not found"))
+			return
+		}
+		c.JSON(200, &response{rep})
 	}
 }
