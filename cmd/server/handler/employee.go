@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/domain"
 	"github.com/BenjaminBergerM/go-meli-exercise/internal/employee"
@@ -168,5 +169,24 @@ func (e *Employee) Delete() gin.HandlerFunc {
 		}
 
 		c.JSON(200, web.NewError(200, "The employee has been deleted"))
+	}
+}
+
+func (e *Employee) GetInboundOrdersByEmployee() gin.HandlerFunc {
+	type response struct {
+		Data interface{} `json:"data"`
+	}
+	return func(c *gin.Context) {
+		id := c.Query("id")
+
+		intId, _ := strconv.Atoi(id)
+
+		ctx := context.Background()
+		rep, err := e.employeeService.GetInboundOrdersByEmployee(ctx, intId)
+		if err != nil {
+			c.JSON(404, web.NewError(404, "employee not found"))
+			return
+		}
+		c.JSON(200, &response{rep})
 	}
 }

@@ -146,7 +146,7 @@ func (r *repository) Delete(ctx context.Context, cardNumberID string) error {
 }
 
 func (r *repository) GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.Buyer, error) {
-	ProdsByPurchase := `SELECT b.*,(
+	query := `SELECT b.*,(
 								SELECT count(id)
 								FROM purchase_orders
 								WHERE purchase_orders.buyer_id = b.id) as cant 
@@ -155,9 +155,9 @@ func (r *repository) GetPurchaseByBuyer(ctx context.Context, id int) ([]domain.B
 	var rows *sql.Rows
 	var err error
 	if id > 0 {
-		rows, err = r.db.Query(ProdsByPurchase, id)
+		rows, err = r.db.Query(query, id)
 	} else {
-		rows, err = r.db.Query(ProdsByPurchase, nil)
+		rows, err = r.db.Query(query, nil)
 	}
 
 	if err != nil {

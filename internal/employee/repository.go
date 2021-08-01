@@ -13,9 +13,11 @@ type Repository interface {
 	GetAll(ctx context.Context) ([]domain.Employee, error)
 	Get(ctx context.Context, cardNumberID string) (domain.Employee, error)
 	Exists(ctx context.Context, cardNumberID string) bool
+	ExistsById(ctx context.Context, id int) bool
 	Save(ctx context.Context, e domain.Employee) (int, error)
 	Update(ctx context.Context, e domain.Employee) error
 	Delete(ctx context.Context, cardNumberID string) error
+	GetInboundOrdersByEmployee(ctx context.Context, id int) ([]domain.Employee, error)
 }
 
 type repository struct {
@@ -62,6 +64,16 @@ func (r *repository) Exists(ctx context.Context, cardNumberID string) bool {
 	sqlStatement := `SELECT card_number_id FROM "main"."employees" WHERE card_number_id=$1;`
 	row := r.db.QueryRow(sqlStatement, cardNumberID)
 	err := row.Scan(&cardNumberID)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (r *repository) ExistsById(ctx context.Context, id int) bool {
+	sqlStatement := `SELECT id FROM "main"."employees" WHERE id=$1;`
+	row := r.db.QueryRow(sqlStatement, id)
+	err := row.Scan(&id)
 	if err != nil {
 		return false
 	}
@@ -131,4 +143,37 @@ func (r *repository) Delete(ctx context.Context, cardNumberID string) error {
 	}
 
 	return nil
+}
+
+func (r *repository) GetInboundOrdersByEmployee(ctx context.Context, id int) ([]domain.Employee, error) {
+	query := `SELECT e.*,(
+								SELECT count(id)
+								FROM inbound_orders
+								WHERE inbound_orders.employee_id = e.id) as cant 
+						FROM employees e
+					   WHERE e.id = IFNULL(?,e.id)`
+
+	var rows *sql.Rows
+	var err error
+	if id > 0 {
+		rows, err = r.db.Query(query, id)
+	} else {
+		rows, err = r.db.Query(query, nil)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var employees []domain.Employee
+	for rows.Next() {
+		e := domain.Employee{}
+		err = rows.Scan(&e.ID, &e.CardNumberID, &e.FirstName, &e.LastName, &e.WarehouseID, &e.InboundOrdersCount)
+		employees = append(employees, e)
+	}
+
+	if err != nil {
+		return employees, err
+	}
+	return employees, nil
 }
