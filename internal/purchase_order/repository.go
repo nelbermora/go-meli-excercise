@@ -9,7 +9,7 @@ import (
 
 const (
 	insertPurchaseOrders = `INSERT INTO purchase_orders
-									(order_number,order_date,order_date,buyer_id,product_record_id,order_status_id) 
+									(order_number,order_date,tracking_code,buyer_id,product_record_id,order_status_id) 
 								  VALUES (?,?,?,?,?,?)`
 )
 
@@ -33,7 +33,7 @@ func (r *repository) Save(ctx context.Context, p domain.PurchaseOrder) (int, err
 		return 0, err
 	}
 
-	res, err := stmt.Exec(&p.OrderNumber, &p.OrderNumber, &p.TrackingCode, &p.BuyerId, &p.ProductRecordId, &p.OrderStatusId)
+	res, err := stmt.Exec(&p.OrderNumber, &p.OrderDate, &p.TrackingCode, &p.BuyerId, &p.ProductRecordId, &p.OrderStatusId)
 	if err != nil {
 		return 0, err
 	}

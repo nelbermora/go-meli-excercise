@@ -153,6 +153,7 @@ CREATE TABLE "purchase_orders"
     "id"                INTEGER,
     "order_number"      TEXT,
     "order_date"        TEXT,
+    "tracking_code"     TEXT,
     "buyer_id"          INTEGER,
     "product_record_id" INTEGER,
     "order_status_id"   INTEGER,
